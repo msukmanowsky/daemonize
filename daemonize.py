@@ -39,11 +39,15 @@ class Daemonize(object):
     :param logger: use this logger object instead of creating new one, if provided.
     :param foreground: stay in foreground; do not fork (for debugging)
     :param chdir: change working directory if provided or /
+    :param action_args: args to pass to action function, any results from
+                        privileged_action() are added to beginning of this list
+    :param action_kwargs: kwargs to pass to action function
     """
     def __init__(self, app, pid, action,
                  keep_fds=None, auto_close_fds=True, privileged_action=None,
                  user=None, group=None, verbose=False, logger=None,
-                 foreground=False, chdir="/"):
+                 foreground=False, chdir="/", action_args=None,
+                 action_kwargs=None):
         self.app = app
         self.pid = os.path.abspath(pid)
         self.action = action
@@ -56,6 +60,8 @@ class Daemonize(object):
         self.auto_close_fds = auto_close_fds
         self.foreground = foreground
         self.chdir = chdir
+        self.action_args = action_args or tuple()
+        self.action_kwargs = action_kwargs or {}
 
     def sigterm(self, signum, frame):
         """
@@ -242,8 +248,9 @@ class Daemonize(object):
 
         self.logger.warn("Starting daemon.")
 
+        args = tuple(privileged_action_result) + self.action_args
         try:
-            self.action(*privileged_action_result)
+            self.action(*args, **self.action_kwargs)
         except Exception as e:
             for line in traceback.format_exc(e).split("\n"):
                 self.logger.error(line)
