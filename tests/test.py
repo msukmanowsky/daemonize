@@ -2,6 +2,7 @@ import grp
 import os
 import pwd
 import subprocess
+import textwrap
 import unittest
 
 from tempfile import mkstemp
@@ -113,11 +114,12 @@ class UidGidTest(unittest.TestCase):
 
 class PrivilegedActionTest(unittest.TestCase):
     def setUp(self):
-        self.correct_log = """Privileged action.
-Starting daemon.
-Action.
-Stopping daemon.
-"""
+        self.correct_log = textwrap.dedent("""
+        Privileged action.
+        Starting daemon.
+        Action.
+        Stopping daemon.
+        """).lstrip()
         self.pidfile = mkstemp()[1]
         self.logfile = mkstemp()[1]
         os.system("python tests/daemon_privileged_action.py %s %s" % (self.pidfile, self.logfile))
