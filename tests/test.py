@@ -1,8 +1,8 @@
-import unittest
+import grp
 import os
 import pwd
-import grp
 import subprocess
+import unittest
 
 from tempfile import mkstemp
 from time import sleep
