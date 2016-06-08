@@ -30,7 +30,9 @@ class Daemonize(object):
                               group parameter is provided.
                               If you want to transfer anything from privileged_action to action, such as
                               opened privileged file descriptor, you should return it from
-                              privileged_action function and catch it inside action function.
+                              privileged_action function. Whatever is returned
+                              from this function is passed to action as the
+                              first arg.
     :param user: drop privileges to this user if provided.
     :param group: drop privileges to this group if provided.
     :param verbose: send debug messages to logger if provided.
