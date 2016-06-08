@@ -153,5 +153,60 @@ class ChdirTest(unittest.TestCase):
         log = open(self.target, "r").read()
         self.assertEqual(log, "test")
 
+
+class ArgsKwargsActionTest(unittest.TestCase):
+    def setUp(self):
+        self.pidfile = mkstemp()[1]
+        self.logfile = mkstemp()[1]
+        self.expected_logfile = textwrap.dedent("""
+        a
+        b
+        c
+        Python
+        False
+        """).lstrip()
+        os.system("python tests/daemon_action_args.py %s %s" % (self.pidfile, self.logfile))
+        sleep(10)
+
+    def tearDown(self):
+        os.system("kill `cat %s`" % self.pidfile)
+        os.remove(self.logfile)
+        sleep(.1)
+
+    def test_is_working(self):
+        with open(self.logfile) as logfile:
+            actual = logfile.read()
+            self.assertEqual(actual, self.expected_logfile)
+
+
+class ArgsKwargsWithPriviledgedTest(unittest.TestCase):
+    def setUp(self):
+        self.pidfile = mkstemp()[1]
+        self.logfile = mkstemp()[1]
+        self.expected_logfile = textwrap.dedent("""
+        x
+        y
+        z
+        a
+        b
+        c
+        Python
+        False
+        """).lstrip()
+        os.system("python tests/daemon_action_args_with_priviliged.py %s %s" % (self.pidfile, self.logfile))
+        sleep(10)
+
+
+    def tearDown(self):
+        os.system("kill `cat %s`" % self.pidfile)
+        os.remove(self.logfile)
+        sleep(.1)
+
+    def test_is_working(self):
+        with open(self.logfile) as logfile:
+            actual = logfile.read()
+            self.assertEqual(actual, self.expected_logfile)
+
+
 if __name__ == '__main__':
     unittest.main()
